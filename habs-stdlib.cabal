@@ -1,0 +1,60 @@
+name: habs-stdlib
+version: 0.0.1
+
+license: BSD3
+license-file: LICENSE
+author: Nikolaos Bezirgiannis
+maintainer: Nikolaos Bezirgiannis <bezirgia@cwi.nl>
+copyright: Copyright (c) 2013-2016, Envisage Consortium
+homepage: http://abs-models.org
+bug-reports: https://github.com/abstools/habs-stdlib/issues
+
+stability: provisional
+tested-with: GHC == 7.8.4, GHC == 7.10.1, GHC == 7.10.2, GHC == 7.10.3
+build-type: Simple
+cabal-version: >= 1.8
+
+category: Concurrency, Distributed Computing
+synopsis: The ABS stdlib expressed natively in Haskell
+description:
+  The ABS stdlib expressed natively in Haskell
+  todo
+
+extra-source-files:
+  README.md
+
+source-repository head
+  type: git
+  location: git://github.com/abstools/habs-stdlib.git
+  branch: master
+
+library
+  build-depends:
+    -- base<=4.6 (i.e. GHC<=7.6.3) not supported because of no `tryReadMVar`
+    base >= 4.7 && < 5,
+    -- containers-0.5.0.0 introduces strict containers, comes bundled with ghc>=7.6.3
+    containers>=0.5.0.0
+  exposed-modules:
+    -- data structures used by the Runtime
+    ABS.StdLib,
+    -- runtime building-blocks that reflect the ABS primitives
+    ABS.DC,
+    -- cmdline options for the runtime
+    ABS.Promise
+  ghc-options: -Wall -fno-warn-orphans
+  hs-source-dirs: src
+
+-- TEST SUITE
+-------------
+
+test-suite unit
+  type: exitcode-stdio-1.0
+  main-is: unit.hs
+  build-depends:
+    base,
+    habs-stdlib,
+    tasty,
+    tasty-hunit,
+    tasty-html
+  ghc-options: -fno-ignore-asserts -threaded "-with-rtsopts=-N4"
+  hs-source-dirs: tests
