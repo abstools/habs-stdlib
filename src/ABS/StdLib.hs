@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, NoImplicitPrelude, ConstraintKinds, CPP #-}
+{-# LANGUAGE FlexibleInstances, NoImplicitPrelude, CPP #-}
 
 module ABS.StdLib
     (
@@ -35,10 +35,7 @@ module ABS.StdLib
      -- ** Sequencing ABS statements
      (Prelude.>>=), (Prelude.=<<),
      -- ** Applicative-style for easier functional application of pure ABS expressions
-     pure, (<$!>), (<*>),
-         
-     -- * According to ABS all datastructures and objects must implement Eq,Show,Ord
-     Eq', Ord', Show'
+     pure, (<$!>), (<*>)
     ) where
 
 import qualified Prelude as Prelude
@@ -287,8 +284,3 @@ substr str d len = Prelude.take len (Prelude.drop d str)
 {-# INLINE strlen #-}
 strlen :: Prelude.String -> Int
 strlen = Prelude.length
-
--- Using the ConstraintKinds extension, we can define typeclass synonyms, to avoid name-clashing when ABS codegen
-type Eq' = Prelude.Eq
-type Ord' = Prelude.Ord
-type Show' = Prelude.Show
