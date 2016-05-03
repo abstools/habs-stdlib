@@ -7,7 +7,11 @@ module ABS.StdLib
      -- | The ABS standard datatypes, most coming from standard Haskell, except Fut coming from @habs-runtime@ package
      Int, Rat, Prelude.Bool (..), Unit, List, Prelude.String, -- Fut
      -- * Operations on numbers
-     (Prelude.<), (Prelude.<=), (Prelude.>=), (Prelude.>), (Prelude.+), (Prelude.-), (Prelude.*), (/), (%), Prelude.abs, pow, Prelude.truncate,
+     (Prelude.<), (Prelude.<=), (Prelude.>=), (Prelude.>), (Prelude.+), (Prelude.-), (Prelude.*), (%), Prelude.abs, pow,
+     -- * Rational division. Takes any number but always returns a Rat.
+     (Prelude./),
+     -- * Rat to Int conversion
+     Prelude.truncate,
      -- * Boolean Operations 
      (Prelude.||), (Prelude.&&), (Prelude.==), Prelude.not,
      -- * Built-in Pairs and Triples and their functions
@@ -30,71 +34,34 @@ module ABS.StdLib
      -- ** Haskell's return 
 
      -- | is an expression taking a pure value and lifting it to the monadic world.
-
      Prelude.return,
-     -- ** Sequencing ABS statements
-     (Prelude.>>=), (Prelude.=<<),
-     -- ** Applicative-style for easier functional application of pure ABS expressions
-     pure, (<$!>), (<*>)
     ) where
 
 import qualified Prelude as Prelude
-import Control.Applicative (pure, (<*>))
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import Data.Maybe (fromJust, isJust)
 import Data.List (length)
-
-#if __GLASGOW_HASKELL__ >= 710
-import Control.Monad ((<$!>))
-#endif
-
-#if __GLASGOW_HASKELL__ >= 780
+import qualified Data.Ratio
 import Data.Either (isLeft, isRight)
-#else
-isLeft :: Prelude.Either a b -> Bool
-isLeft (Prelude.Left  _) = Prelude.True
-isLeft (Prelude.Right _) = Prelude.False
 
-isRight :: Prelude.Either a b -> Bool
-isRight (Prelude.Left  _) = Prelude.False
-isRight (Prelude.Right _) = Prelude.True
-#endif
-
-#if __GLASGOW_HASKELL__ < 710
--- strict fmap (applicative), taken from base-4.8
--- TODO: specialize
-{-# INLINE (<$!>) #-}
-(<$!>) :: Prelude.Monad m => (t -> b) -> m t -> m b
-f <$!> m = do
-  x <- m
-  let z = f x
-  z `Prelude.seq` Prelude.return z
-#endif
-
-
-
--- | ABS Number are either 'Int'egers or 'Rat'ionals
-class (Prelude.Num a) => Number a where
-    (/) :: a -> a -> a
-
-instance Number Int where
-    (/) = Prelude.div
-
-instance Number Rat where
-    (/) = (Prelude./)
-
--- | Modulo operation. Takes strictly two integers
--- and returns a polymorphic number (either Int or Rational, based on the followup computation).
+-- | Modulo operation. Takes two 'Rat's and returns an integer. 
+--
+-- Truncated towards 0, so it is Haskell's 'rem'.
 {-# INLINE (%) #-}
-(%) :: Number b => Int -> Int -> b
-x % y = Prelude.fromIntegral (x `Prelude.mod` y)
+(%) :: Rat -> Rat -> Int
+x % y = let res = x Prelude./ y
+        in Data.Ratio.numerator res `Prelude.rem` Data.Ratio.denominator res
 
 -- | Raising a number to a non-negative integer power
+--
+-- Note: deviation, abstools defines pow also for negative integral powers, but then
+-- the result always will be a Rat: int/rat conversion issue
+-- 
+-- Another way is to always return a Rat with (^^) and then to explicitly truncate if you want Int.
 {-# INLINE pow #-}
-pow :: Number b => b -> Int -> b
-pow x y | y Prelude.< 0     = 0 -- TODO: this should normally return an error
-        | Prelude.otherwise = x Prelude.^ y
+pow :: Prelude.Num a => a -> Int -> a
+pow = (Prelude.^)
 
 type Unit = ()
 
@@ -102,7 +69,7 @@ type Int = Prelude.Int
 
 type Bool = Prelude.Bool
 
-type Rat = Prelude.Rational
+type Rat = Data.Ratio.Ratio Prelude.Int
 
 -------- LISTS--------------
 ----------------------------
