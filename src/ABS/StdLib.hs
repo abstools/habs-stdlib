@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, NoImplicitPrelude, CPP #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module ABS.StdLib
     (
