@@ -7,13 +7,15 @@ module ABS.StdLib
      -- | The ABS standard datatypes, most coming from standard Haskell, except Fut coming from @habs-runtime@ package
      Int, Rat, Prelude.Bool (..), Unit, List, Prelude.String, -- Fut
      -- * Operations on numbers
-     (Prelude.<), (Prelude.<=), (Prelude.>=), (Prelude.>), (Prelude.+), (Prelude.-), (Prelude.*), (%), Prelude.abs, pow,
+     (Prelude.+), (Prelude.-), (Prelude.*), (%), Prelude.abs, pow,
      -- * Rational division. Takes any number but always returns a Rat.
      (Prelude./),
      -- * Rat to Int conversion
      Prelude.truncate,
      -- * Boolean Operations 
      (Prelude.||), (Prelude.&&), (Prelude.==), Prelude.not,
+     -- * Ordering operations
+     (Prelude.<), (Prelude.<=), (Prelude.>=), (Prelude.>), Prelude.min, Prelude.max, Prelude.minimum, Prelude.maximum,
      -- * Built-in Pairs and Triples and their functions
      Pair, Prelude.fst, Prelude.snd, Triple, fstT, sndT, trd,
      -- * Maybe, Either datatypes and their functions
