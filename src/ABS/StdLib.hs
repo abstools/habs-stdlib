@@ -24,9 +24,9 @@ module ABS.StdLib
      -- * Functions for "List" datastructures
      list, Prelude.tail, Prelude.head, length, isEmpty, nth, concatenate, appendright, without, Prelude.repeat, Prelude.reverse, copy,
      -- * The ABS Map datatype and its functions
-     M.Map, map, _emptyMap, put, insert, lookupUnsafe, lookupMaybe, lookupDefault, removeKey, keys, values,
+     M.Map, map, _emptyMap, put, insert, lookup, lookupMaybe, lookupUnsafe, lookupDefault, removeKey, keys, values,
      -- * The ABS Set datatype and its functions
-     S.Set, set, _emptySet, emptySet, S.size, contains, S.union, S.intersection, S.difference, insertElement, remove, take,
+     S.Set, set, _emptySet, emptySet, S.size, contains, S.union, S.intersection, S.difference, insertElement, remove, take, hasNext, next,
      -- * Printing to Strings and to standard-output
      toString, intToString, substr, strlen,
      -- * Lifting ABS pure code to ABS object layer
@@ -127,13 +127,20 @@ put m k v = M.insert k v m
 insert :: Prelude.Ord k => M.Map k v -> (k,v) -> M.Map k v
 insert m (k,v) = M.insert k v m
 
+{-# INLINE lookup #-}
+lookup :: Prelude.Ord k => M.Map k v -> k -> Prelude.Maybe v
+lookup = Prelude.flip M.lookup
+
+{-# DEPRECATED lookupMaybe "Use lookup instead" #-}
+{-# INLINE lookupMaybe #-}
+-- | Synonym to lookup
+lookupMaybe :: Prelude.Ord k => M.Map k v -> k -> Prelude.Maybe v
+lookupMaybe = lookup
+
 {-# INLINE lookupUnsafe #-}
 lookupUnsafe :: Prelude.Ord k => M.Map k v -> k -> v
 lookupUnsafe m k = m M.! k
 
-{-# INLINE lookupMaybe #-}
-lookupMaybe :: Prelude.Ord k => M.Map k v -> k -> Prelude.Maybe v
-lookupMaybe = Prelude.flip M.lookup
 
 -- | Returns the value associated with key 'k' in map 'ms', or the value 'd'
 -- if 'k' has no entry in 'ms'.
@@ -195,9 +202,19 @@ remove = Prelude.flip S.delete
 -- To iterate over a set, take one element and remove it from the set.
 -- Repeat until set is empty.
 {-# INLINE take #-}
-take :: Prelude.Ord a => S.Set a -> a
+take :: S.Set a -> a
 take = S.findMin
 
+{-# INLINE hasNext #-}
+hasNext :: S.Set a -> Bool
+hasNext s = Prelude.not (S.null s)
+
+{-# INLINE next #-}
+-- | NB: partial function, combine it with 'hasNext'.
+next :: S.Set a -> (S.Set a, a)
+next s = case S.minView s of
+    Prelude.Just (v,s') -> (s',v)
+    Prelude.Nothing -> Prelude.error "next() called on empty set"
 -------- TUPLES-------------
 ----------------------------
 
