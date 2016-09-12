@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoImplicitPrelude, FlexibleInstances #-}
 
 module ABS.StdLib
     (
@@ -241,7 +241,15 @@ right _ = Prelude.error "not a right-Either"
 -------- STRINGS------------
 ----------------------------
 
-
+-- trick to overload the (+) for concatenating strings
+instance Prelude.Num [Prelude.Char] where
+  x + y = x Prelude.++ y
+  (-) = Prelude.undefined
+  (*) = Prelude.undefined
+  abs = Prelude.undefined
+  signum = Prelude.undefined
+  fromInteger = Prelude.undefined
+  
 -- these two are better situated as statements in the habs-runtime: ABS.Runtime haskell library
 -- println :: ContT () Prelude.IO Prelude.String -> ContT () Prelude.IO ()
 -- println act = act Prelude.>>= \ s -> liftIO (Prelude.putStrLn s)
