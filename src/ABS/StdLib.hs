@@ -8,6 +8,8 @@ module ABS.StdLib
      Int, Rat, Prelude.Bool (..), Unit, List, Prelude.String, -- Fut
      -- * Operations on numbers
      (Prelude.+), (Prelude.-), (Prelude.*), (%), Prelude.abs, pow,
+     -- * Operations on rationals
+     Data.Ratio.numerator, Data.Ratio.denominator,
      -- * Rational division. Takes any number but always returns a Rat.
      (Prelude./),
      -- * Rat to Int conversion
