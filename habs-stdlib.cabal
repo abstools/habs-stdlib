@@ -34,7 +34,8 @@ library
     -- base<=4.7 (i.e. GHC<=7.8.4) not supported because of generated code relies on PartialTypeSignatures
     base >= 4.8 && < 5,
     -- containers-0.5.0.0 introduces strict containers, comes bundled with ghc>=7.6.3
-    containers>=0.5.0.0
+    containers>=0.5.0.0,
+    genifunctors>=0.4
   exposed-modules:
     -- the functions and data of the ABS standard-library, expressed directly in Haskell
     ABS.StdLib,

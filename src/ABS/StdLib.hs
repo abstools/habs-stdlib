@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, FlexibleInstances #-}
+{-# LANGUAGE NoImplicitPrelude, FlexibleInstances, TemplateHaskell #-}
 
 module ABS.StdLib
     (
@@ -19,12 +19,12 @@ module ABS.StdLib
      -- * Ordering operations
      (Prelude.<), (Prelude.<=), (Prelude.>=), (Prelude.>), Prelude.min, Prelude.max, Prelude.minimum, Prelude.maximum,
      -- * Built-in Pairs and Triples and their functions
-     Pair, Prelude.fst, Prelude.snd, Triple, fstT, sndT, trd,
+     Pair, Prelude.fst, Prelude.snd, Triple, fstT, sndT, trd, fmap'Pair, fmap'Triple,
      -- * Maybe, Either datatypes and their functions
-     Prelude.Maybe (..), fromJust, isJust,
-     Prelude.Either (..), left, right, isLeft, isRight,
+     Prelude.Maybe (..), fromJust, isJust, fmap'Maybe,
+     Prelude.Either (..), left, right, isLeft, isRight, fmap'Either,
      -- * Functions for "List" datastructures
-     list, Prelude.tail, Prelude.head, length, isEmpty, nth, concatenate, appendright, without, Prelude.repeat, Prelude.reverse, copy,
+     list, Prelude.tail, Prelude.head, length, isEmpty, nth, concatenate, appendright, without, Prelude.repeat, Prelude.reverse, copy, fmap'List,
      -- * The ABS Map datatype and its functions
      M.Map, map, _emptyMap, put, insert, lookup, lookupMaybe, lookupUnsafe, lookupDefault, removeKey, keys, values,
      -- * The ABS Set datatype and its functions
@@ -48,7 +48,8 @@ import Data.Maybe (fromJust, isJust)
 import Data.List (length)
 import qualified Data.Ratio
 import Data.Either (isLeft, isRight)
-
+import Data.Bifunctor (bimap)
+import Data.Generics.Genifunctors (genFmap)
 -- | Modulo operation. Takes two 'Rat's and returns an integer. 
 --
 -- Truncated towards 0, so it is Haskell's 'rem'.
@@ -280,3 +281,26 @@ substr str d len = Prelude.take len (Prelude.drop d str)
 {-# INLINE strlen #-}
 strlen :: Prelude.String -> Int
 strlen = Prelude.length
+
+
+-- ALIASES for genifunctors subtyping
+{-# INLINE fmap'List #-}
+fmap'List :: (a->b) -> [a] -> [b]
+fmap'List = Prelude.fmap
+
+{-# INLINE fmap'Maybe #-}
+fmap'Maybe :: (a->b) -> Prelude.Maybe a -> Prelude.Maybe b
+fmap'Maybe = Prelude.fmap
+
+
+{-# INLINE fmap'Either #-}
+fmap'Either :: (a->c) -> (b->d) -> Prelude.Either a b -> Prelude.Either c d
+fmap'Either = bimap
+
+
+{-# INLINE fmap'Pair #-}
+fmap'Pair :: (a->c) -> (b->d) -> Pair a b -> Pair c d
+fmap'Pair = bimap
+
+fmap'Triple :: (a ->a1) -> (b -> b1) -> (c -> c1) -> (a,b,c) -> (a1,b1,c1)
+fmap'Triple = $(genFmap ''(,,))
